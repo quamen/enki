@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
-describe Admin::PostsController do
+describe Admin::PagesController do
   describe 'handling GET to index' do
     before(:each) do
-      @posts = [mock_model(Post), mock_model(Post)]
-      Post.stub!(:paginate).and_return(@posts)
+      @pages = [mock_model(Page), mock_model(Page)]
+      Page.stub!(:paginate).and_return(@pages)
       session[:logged_in] = true
       get :index
     end
@@ -17,16 +17,16 @@ describe Admin::PostsController do
       response.should render_template('index')
     end
 
-    it "finds posts for the view" do
-      assigns[:posts].should == @posts
+    it "finds pages for the view" do
+      assigns[:pages].should == @pages
     end
   end
 
   describe 'handling GET to index, YAML request' do
     before(:each) do
-      @posts = [mock_model(Post), mock_model(Post)]
-      @posts.each {|post| post.stub!(:to_serializable) }
-      Post.stub!(:find).and_return(@posts)
+      @pages = [mock_model(Page), mock_model(Page)]
+      @pages.each {|page| page.stub!(:to_serializable) }
+      Page.stub!(:find).and_return(@pages)
       session[:logged_in] = true
       get :index, :format => 'yaml'
     end
@@ -36,15 +36,15 @@ describe Admin::PostsController do
       response.should be_success
     end
 
-    it "finds posts with out pagination" do
-      assigns[:posts].should == @posts
+    it "finds pages with out pagination" do
+      assigns[:pages].should == @pages
     end
   end
 
   describe 'handling GET to show' do
     before(:each) do
-      @post = mock_model(Post)
-      Post.stub!(:find).and_return(@post)
+      @page = mock_model(Page)
+      Page.stub!(:find).and_return(@page)
       session[:logged_in] = true
       get :show, :id => 1
     end
@@ -57,15 +57,15 @@ describe Admin::PostsController do
       response.should render_template('show')
     end
 
-    it "finds post for the view" do
-      assigns[:post].should == @post
+    it "finds page for the view" do
+      assigns[:page].should == @page
     end
   end
   
   describe 'handling GET to show, YAML format' do
     before(:each) do
-      @post = mock_model(Post)
-      Post.stub!(:find).and_return(@post)
+      @page = mock_model(Page)
+      Page.stub!(:find).and_return(@page)
       session[:logged_in] = true
       get :show, :id => 1, :format => 'yaml'
     end
@@ -78,21 +78,27 @@ describe Admin::PostsController do
 
   describe 'handling PUT to update with valid attributes' do
     before(:each) do
-      @post = mock_model(Post)
-      @post.stub!(:update_attributes).and_return(true)
-      Post.stub!(:find).and_return(@post)
+      @page = mock_model(Page)
+      @page.stub!(:update_attributes).and_return(true)
+      Page.stub!(:find).and_return(@page)
     end
 
     def do_put
       session[:logged_in] = true
-      put :update, :id => 1, :post => valid_post_attributes      
+      put :update, :id => 1, :page => {
+        'title' => 'My Post',
+        'slug'  => 'my-post',
+        'body'  => 'This is my post'
+      }
     end
 
-    it 'updates the post' do
-      published_at = Time.now
-      @post.should_receive(:update_attributes).with(valid_post_attributes)
+    it 'updates the page' do
+      @page.should_receive(:update_attributes).with(
+        'title' => 'My Post',
+        'slug'  => 'my-post',
+        'body'  => 'This is my post'
+      )
 
-      Time.stub!(:now).and_return(published_at)
       do_put
     end
 
@@ -104,14 +110,14 @@ describe Admin::PostsController do
 
   describe 'handling PUT to update with invalid attributes' do
     before(:each) do
-      @post = mock_model(Post)
-      @post.stub!(:update_attributes).and_return(false)
-      Post.stub!(:find).and_return(@post)
+      @page = mock_model(Page)
+      @page.stub!(:update_attributes).and_return(false)
+      Page.stub!(:find).and_return(@page)
     end
 
     def do_put
       session[:logged_in] = true
-      put :update, :id => 1, :post => {}
+      put :update, :id => 1, :page => {}
     end
 
     it 'renders edit' do
@@ -127,19 +133,28 @@ describe Admin::PostsController do
 
   describe 'handling PUT to update with valid attributes, YAML request' do
     before(:each) do
-      @post = mock_model(Post)
-      @post.stub!(:update_attributes).and_return(true)
-      Post.stub!(:find).and_return(@post)
+      @page = mock_model(Page)
+      @page.stub!(:update_attributes).and_return(true)
+      Page.stub!(:find).and_return(@page)
     end
 
     def do_put
-      request.env['RAW_POST_DATA'] = {'post' => valid_post_attributes}.to_yaml
+      request.env['RAW_POST_DATA'] = {'page' => {
+        'title' => 'My Post',
+        'slug'  => 'my-post',
+        'body'  => 'This is my post'
+      }}.to_yaml
       request.headers['HTTP_X_ENKIHASH'] = hash_request(request)
       put :update, :id => 1, :format => 'yaml'
     end
 
-    it 'updates the post' do
-      @post.should_receive(:update_attributes).with(valid_post_attributes)
+    it 'updates the page' do
+      @page.should_receive(:update_attributes).with(
+        'title' => 'My Post',
+        'slug'  => 'my-post',
+        'body'  => 'This is my post'
+      )
+
       do_put
     end
     
@@ -151,9 +166,9 @@ describe Admin::PostsController do
 
   describe 'handling PUT to update with invalid attributes, YAML request' do
     before(:each) do
-      @post = mock_model(Post)
-      @post.stub!(:update_attributes).and_return(false)
-      Post.stub!(:find).and_return(@post)
+      @page = mock_model(Page)
+      @page.stub!(:update_attributes).and_return(false)
+      Page.stub!(:find).and_return(@page)
     end
 
     def do_put
@@ -166,19 +181,5 @@ describe Admin::PostsController do
       do_put
       response.headers['Status'].should == '422 Unprocessable Entity'
     end
-  end
-
-  describe 'handling POST to create with valid attributes' do
-    it 'creates a post' do
-      session[:logged_in] = true
-      lambda { post :create, :post => valid_post_attributes }.should change(Post, :count).by(1)
-    end
-  end
-
-  def valid_post_attributes
-    {
-      'title' => "My Post",
-      'body' => "hello this is my post"
-    }
   end
 end

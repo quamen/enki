@@ -12,37 +12,37 @@
 ActiveRecord::Schema.define(:version => 6) do
 
   create_table "comments", :force => true do |t|
-    t.integer  "post_id",                                 :null => false
-    t.string   "author",                  :default => "", :null => false
-    t.string   "author_url",              :default => "", :null => false
-    t.string   "author_email",            :default => "", :null => false
-    t.string   "author_openid_authority", :default => "", :null => false
-    t.text     "body",                    :default => "", :null => false
-    t.text     "body_html",               :default => "", :null => false
+    t.integer  "post_id",                 :null => false
+    t.string   "author",                  :null => false
+    t.string   "author_url",              :null => false
+    t.string   "author_email",            :null => false
+    t.string   "author_openid_authority", :null => false
+    t.text     "body",                    :null => false
+    t.text     "body_html",               :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "comments", ["created_at"], :name => "index_comments_on_created_at"
   add_index "comments", ["post_id"], :name => "index_comments_on_post_id"
+  add_index "comments", ["created_at"], :name => "index_comments_on_created_at"
 
   create_table "pages", :force => true do |t|
-    t.string   "title",      :default => "", :null => false
-    t.string   "slug",       :default => "", :null => false
-    t.text     "body",       :default => "", :null => false
-    t.text     "body_html",  :default => "", :null => false
+    t.string   "title",      :null => false
+    t.string   "slug",       :null => false
+    t.text     "body",       :null => false
+    t.text     "body_html",  :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "pages", ["created_at"], :name => "index_pages_on_created_at"
   add_index "pages", ["title"], :name => "index_pages_on_title"
+  add_index "pages", ["created_at"], :name => "index_pages_on_created_at"
 
   create_table "posts", :force => true do |t|
-    t.string   "title",                   :default => "",   :null => false
-    t.string   "slug",                    :default => "",   :null => false
-    t.text     "body",                    :default => "",   :null => false
-    t.text     "body_html",               :default => "",   :null => false
+    t.string   "title",                                     :null => false
+    t.string   "slug",                                      :null => false
+    t.text     "body",                                      :null => false
+    t.text     "body_html",                                 :null => false
     t.boolean  "active",                  :default => true, :null => false
     t.integer  "approved_comments_count", :default => 0,    :null => false
     t.string   "cached_tag_list"
@@ -54,14 +54,14 @@ ActiveRecord::Schema.define(:version => 6) do
   add_index "posts", ["published_at"], :name => "index_posts_on_published_at"
 
   create_table "sessions", :force => true do |t|
-    t.string   "session_id", :default => "", :null => false
+    t.string   "session_id", :null => false
     t.text     "data"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
+  add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
 
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id"
@@ -69,8 +69,8 @@ ActiveRecord::Schema.define(:version => 6) do
     t.datetime "created_at"
   end
 
-  add_index "taggings", ["tag_id"], :name => "index_taggings_on_tag_id"
   add_index "taggings", ["taggable_id"], :name => "index_taggings_on_taggable_id_and_taggable_type"
+  add_index "taggings", ["tag_id"], :name => "index_taggings_on_tag_id"
 
   create_table "tags", :force => true do |t|
     t.string  "name"
