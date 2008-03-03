@@ -83,7 +83,7 @@ end
 describe Comment, '#blank_openid_fields_if_unused' do
   describe 'when author is not authenticated via OpenID' do
     before(:each) do
-      @comment = Comment.new
+      @comment = Comment.new(:author => "Jack Johnson")
       @comment.stub!(:requires_openid_authentication).and_return(false)
       @comment.blank_openid_fields_if_unused
     end
